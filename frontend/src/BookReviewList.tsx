@@ -1,7 +1,9 @@
+import BookReview from "./models/bookReview";
 function BookReviewList({ reviews }: { reviews: BookReview[] }) {
   return (
     <div>
-      <h1>Book Reviews</h1>
+      <h3>TODO: Add the ability to filter by rating</h3>
+
       <ul>
         {reviews.map((review) => (
           <li key={review.book.isbn}>
