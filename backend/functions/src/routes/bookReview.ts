@@ -30,38 +30,45 @@ const reviews: BookReview[] = [
   },
 ];
 
-// TODO - Add a route to get all book reviews. You should be able to filter by rating
 routes.get("/", (req, res) => {
-  // TODO - Add code to get all book reviews
-  const rating = req.query.rating;
+  if (req.query.rating) {
+    // filter
+    const rating = parseInt(req.query.rating as string);
 
-  if (rating) {
-    const filteredReviews = reviews.filter(
-      (review) => review.rating === parseInt(rating as string)
-    );
+    const filteredReviews = reviews.filter((review) => {
+      return review.rating === rating;
+    });
+
+    res.json(filteredReviews);
+  } else if (req.query.gte) {
+    const gte = parseInt(req.query.gte as string);
+
+    const filteredReviews = reviews.filter((review) => {
+      return review.rating >= gte;
+    });
+
     res.json(filteredReviews);
   } else {
     res.json(reviews);
   }
 });
 
-// TODO - Add a route to get a book review by ISBN
 routes.get("/:isbn", (req, res) => {
   const isbn = req.params.isbn;
-  const review = reviews.find((review) => review.book.isbn === isbn);
 
-  if (review) {
-    res.json(review);
-  } else {
-    res.status(404).json({ error: "Review not found" });
-  }
+  const review = reviews.find((review) => {
+    review.book.isbn === isbn;
+  });
+
+  res.json(review);
 });
 
-// TODO - Add a route to add a book review
 routes.post("/", (req, res) => {
-  const newReview: BookReview = req.body;
-  reviews.push(newReview);
-  res.json(newReview);
+  const review = req.body as BookReview;
+
+  reviews.push(review);
+
+  res.status(201).json(reviews);
 });
 
 export default routes;
