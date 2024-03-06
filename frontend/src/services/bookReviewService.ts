@@ -1,7 +1,9 @@
 import axios from "axios";
 import BookReview from "../models/bookReview";
 
-const API_URL = "http://localhost:3000/reviews/";
+const baseUrl: string = import.meta.env.VITE_API_URL || "";
+
+const API_URL =  baseUrl + "reviews/";
 
 const getBookReviews = async (rating?: number): Promise<BookReview[]> => {
   const response = await axios.get(API_URL, {
