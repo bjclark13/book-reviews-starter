@@ -30,7 +30,7 @@ function App() {
           // if you are logged in
           user ? (
             <>
-              <img src={user.photoURL} />
+              <img src={user.photoURL || ""} />
               <h2>{user.displayName}</h2> <button onClick={signOut}>Sign out</button>
             </>
           ) : (

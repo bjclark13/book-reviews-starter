@@ -1,5 +1,8 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import BookReview from "./models/bookReview";
+import { storage } from "../firebaseConfig";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+
 interface Props {
   onSubmit: (bookReview: BookReview) => void;
 }
@@ -9,6 +12,11 @@ function BookReviewForm({ onSubmit }: Props) {
   const [title, setTitle] = useState("");
   const [rating, setRating] = useState(0);
   const [review, setReview] = useState("");
+  const [image, setImage] = useState("");
+
+  // access the underlying html element that react usually
+  // abstracts away from us.
+  const fileRef = useRef<HTMLInputElement>(null);
 
   return (
     <form
@@ -18,6 +26,7 @@ function BookReviewForm({ onSubmit }: Props) {
           book: {
             isbn,
             title,
+            imageUrl: image
           },
           rating,
           review,
@@ -26,6 +35,25 @@ function BookReviewForm({ onSubmit }: Props) {
         setTitle("");
         setRating(0);
         setReview("");
+
+        if (fileRef.current?.files?.length) {
+          const file = fileRef.current?.files[0]; // assuming we're only uploading one file
+
+          // storage = the storage object that contected to firebase
+          const storageRef = ref(storage, "book-covers/" + file.name);
+         
+          // storageRef is "where to upload"
+          // file is "what to upload"
+          uploadBytes(storageRef, file).then((snapshot) => {
+            getDownloadURL(snapshot.ref).then( (url) => {
+              console.log(url);
+
+              // or set to a state
+              setImage(url);
+              // or whatever we want
+            })
+          });
+        }
       }}
     >
       <label>
@@ -46,6 +74,15 @@ function BookReviewForm({ onSubmit }: Props) {
         />
       </label>
 
+      {
+        image && <img src={image} alt={title + "cover"} />
+      }
+
+      <label>
+        Cover Art
+        <input type="file" ref={fileRef} />
+      </label>
+
       <label>
         Rating
         <input
@@ -59,10 +96,7 @@ function BookReviewForm({ onSubmit }: Props) {
 
       <label>
         Review
-        <textarea
-          onChange={(e) => setReview(e.target.value)}
-          value={review}
-        />
+        <textarea onChange={(e) => setReview(e.target.value)} value={review} />
       </label>
       <button>Submit</button>
     </form>

@@ -1,6 +1,7 @@
 interface Book {
   isbn: string;
   title: string;
+  imageUrl: string;
 }
 
 interface BookReview {
